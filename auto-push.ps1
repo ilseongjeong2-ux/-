@@ -1,18 +1,17 @@
 ﻿$folder = "C:\Users\배훈기(HunkiBae)\Desktop\Html\dashbord-1"
 Set-Location $folder
 
-$watcher = New-Object System.IO.FileSystemWatcher
-$watcher.Path = $folder
-$watcher.Filter = "*.html"
-$watcher.NotifyFilter = [System.IO.NotifyFilters]::LastWrite
-$watcher.EnableRaisingEvents = $true
+$file = Get-ChildItem "$folder\*.html" | Select-Object -First 1
+$lastWrite = $file.LastWriteTime
 
 Write-Host "Watching for changes... Press Ctrl+C to stop." -ForegroundColor Green
 
 while ($true) {
-    $result = $watcher.WaitForChanged([System.IO.WatcherChangeTypes]::Changed, 2000)
-    if (-not $result.TimedOut) {
-        Start-Sleep -Seconds 1
+    Start-Sleep -Seconds 3
+    $file = Get-ChildItem "$folder\*.html" | Select-Object -First 1
+    $current = $file.LastWriteTime
+    if ($current -ne $lastWrite) {
+        $lastWrite = $current
         Write-Host "Change detected. Pushing to GitHub..." -ForegroundColor Yellow
         git add .
         git commit -m "update"
