@@ -741,12 +741,25 @@
 
             const hasRealUploads = keys.some(k => k !== 'default');
 
-            // 1단계: 수출 표준품 현황 + 출고 완료만 병합 (행 수 기준)
+            // 1단계: 수출 표준품 현황 + 출고 완료를 round+code 기준으로 중복 없이 병합
+            const baseMap = new Map();
+            const statusPriority = { '출고완료': 4, '포장완료': 3, '포장대기': 2, '미입고': 1 };
             keys.forEach(k => {
                 if (hasRealUploads && k === 'default') return;
                 if (k.includes('충주공장 재고')) return;
-                combined = mergeDatasets(combined, datasetMap[k]);
+                (datasetMap[k] || []).forEach(item => {
+                    const key = `${item.round}|${item.code}`;
+                    if (!baseMap.has(key)) {
+                        baseMap.set(key, { ...item });
+                    } else {
+                        const ex = baseMap.get(key);
+                        const pEx = statusPriority[ex.status] || 0;
+                        const pNew = statusPriority[item.status] || 0;
+                        if (pNew >= pEx) baseMap.set(key, { ...ex, ...item });
+                    }
+                });
             });
+            combined = Array.from(baseMap.values());
 
             // 2단계: 충주공장 재고는 신규 행 추가 없이 기존 행의 진행 상태만 업데이트
             keys.forEach(k => {
