@@ -2256,35 +2256,7 @@
                 }
             }
 
-            // 2) 충주공장 재고: H열(index 7)=포장일, D열(index 3)=수량
-            //    (건명+제품코드+색상+포장일) 키로 중복 제거 후 합산, 포장일 공백 제외
-            var stockRows = state.rawStockRows;
-            if (stockRows && stockRows.length > 1) {
-                var hdr = stockRows[0].map(function(h){ return (h||'').toString().trim(); });
-                var iRound = hdr.reduce(function(a,h,i){ return a<0&&(h==='건명'||h==='수주건명')?i:a; }, -1);
-                var iCode  = hdr.reduce(function(a,h,i){ return a<0&&(h==='제품코드'||h==='품목코드')?i:a; }, -1);
-                var iColor = hdr.reduce(function(a,h,i){ return a<0&&(h==='색상'||h==='컬러')?i:a; }, -1);
-                if (iRound < 0) iRound = 1;
-                if (iCode  < 0) iCode  = 2;
-                if (iColor < 0) iColor = 5;
-
-                var grouped = {};
-                for (var j = 1; j < stockRows.length; j++) {
-                    var srow = stockRows[j];
-                    if (!hasData(srow)) continue;
-                    var d = normalizeDate((srow[7] || '').toString().trim()); // H열=포장일
-                    if (!d || d === '-') continue;
-                    var gKey = (srow[iRound]||'').toString().trim() + '|'
-                             + (srow[iCode] ||'').toString().trim() + '|'
-                             + (srow[iColor]||'').toString().trim() + '|' + d;
-                    if (!grouped[gKey]) grouped[gKey] = { d: d, qty: 0 };
-                    grouped[gKey].qty += parseQty(srow[3]); // D열=수량
-                }
-                Object.keys(grouped).forEach(function(k) {
-                    var g = grouped[k];
-                    _packingDateQtyMap[g.d] = (_packingDateQtyMap[g.d] || 0) + g.qty;
-                });
-            }
+            // 충주공장 재고는 제외 — 출고 완료 시트 기준으로만 집계
 
             initPackingYearSelect();
             updatePackingModeSlider();
