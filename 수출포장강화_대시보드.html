@@ -2460,25 +2460,25 @@
         }
 
         function openChartDetailModal(country, statusType) {
-            // A열(index 0)=제품구분 기준, E열(index 4)=수주건명, D열(index 3)=수량, I열(index 8)=진행
+            // A열(index 0)=제품구분, B열(index 1)=품목코드, D열(index 3)=수량, I열(index 8)=진행
             const shippedRows = state.rawShippedRows;
-            const roundMap = {};
+            const codeMap = {};
 
             if (shippedRows && shippedRows.length > 1) {
                 for (let i = 1; i < shippedRows.length; i++) {
                     const row = shippedRows[i];
                     if (!row || row.every(c => !c || c.toString().trim() === '')) continue;
 
-                    const label    = row[0] ? row[0].toString().trim() : '';
+                    const label = row[0] ? row[0].toString().trim() : '';
                     if (label !== country) continue;
 
-                    const roundVal = row[4] ? row[4].toString().trim() : '-';
+                    const codeVal  = row[1] ? row[1].toString().trim().toUpperCase() : '-';
                     const qty      = row[3] ? parseInt(row[3].toString().replace(/[^0-9]/g, '')) || 0 : 0;
                     const progress = row[8] ? row[8].toString().trim() : '';
 
-                    if (!roundMap[roundVal]) roundMap[roundVal] = { strengthened: 0, shipped: 0 };
-                    roundMap[roundVal].strengthened += qty;
-                    if (progress === '출고') roundMap[roundVal].shipped += qty;
+                    if (!codeMap[codeVal]) codeMap[codeVal] = { strengthened: 0, shipped: 0 };
+                    codeMap[codeVal].strengthened += qty;
+                    if (progress === '출고') codeMap[codeVal].shipped += qty;
                 }
             }
 
@@ -2486,18 +2486,18 @@
             const tbody = document.getElementById('chartModalTableBody');
             tbody.innerHTML = '';
 
-            const sortedRounds = Object.keys(roundMap)
-                .map(round => ({ round, val: statusType === '강화완료' ? roundMap[round].strengthened : roundMap[round].shipped }))
+            const sorted = Object.keys(codeMap)
+                .map(code => ({ code, val: statusType === '강화완료' ? codeMap[code].strengthened : codeMap[code].shipped }))
                 .filter(r => r.val > 0)
-                .sort((a, b) => a.round.localeCompare(b.round));
+                .sort((a, b) => a.code.localeCompare(b.code));
 
-            if (sortedRounds.length === 0) {
+            if (sorted.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="2" class="py-4 text-center text-slate-500">데이터 없음</td></tr>';
             } else {
-                sortedRounds.forEach(({ round, val }) => {
+                sorted.forEach(({ code, val }) => {
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-slate-800/40 transition-colors';
-                    tr.innerHTML = '<td class="py-2.5 px-4 font-semibold text-white">' + round + '</td><td class="py-2.5 px-4 text-right text-accentBlue font-bold">' + val.toLocaleString() + ' ea</td>';
+                    tr.innerHTML = '<td class="py-2.5 px-4 font-semibold text-accentBlue font-mono">' + code + '</td><td class="py-2.5 px-4 text-right text-white font-bold">' + val.toLocaleString() + ' EA</td>';
                     tbody.appendChild(tr);
                 });
             }
