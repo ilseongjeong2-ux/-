@@ -703,7 +703,7 @@
         });
 
         // 다중 파일 로드 시 중복 행 증발 방지 및 결합 파이프라인
-        // 충주공장 재고: 파렛트 단위 중복행을 코드+건명 기준으로 수량 합산해 1행으로 통합
+        // 충주공장 재고: 내부 파렛트 중복을 round+code 기준으로 수량 합산 → 1행 통합
         function deduplicateStockByPallet(data) {
             const map = new Map();
             data.forEach(item => {
@@ -721,20 +721,39 @@
             return Array.from(map.values());
         }
 
+        // 충주공장 재고를 기존 combined에 병합 시 round+code 기준으로 이미 있으면 건너뜀
+        function mergeStockIntoBase(baseData, stockData) {
+            const existingKeys = new Set(baseData.map(item => `${item.round}|${item.code}`));
+            const result = [...baseData];
+            stockData.forEach(item => {
+                const key = `${item.round}|${item.code}`;
+                if (!existingKeys.has(key)) {
+                    result.push({ ...item });
+                    existingKeys.add(key);
+                }
+            });
+            return result;
+        }
+
         function combineDatasets() {
             let combined = [];
             const keys = Object.keys(datasetMap);
 
             const hasRealUploads = keys.some(k => k !== 'default');
 
+            // 1단계: 수출 표준품 현황 + 출고 완료 먼저 병합
             keys.forEach(k => {
                 if (hasRealUploads && k === 'default') return;
-                let sheetData = datasetMap[k];
-                // 충주공장 재고는 파렛트 중복 행을 먼저 합산 후 병합
+                if (k.includes('충주공장 재고')) return;
+                combined = mergeDatasets(combined, datasetMap[k]);
+            });
+
+            // 2단계: 충주공장 재고는 파렛트 합산 후 round+code 기준으로 신규 항목만 추가
+            keys.forEach(k => {
                 if (k.includes('충주공장 재고')) {
-                    sheetData = deduplicateStockByPallet(sheetData);
+                    const deduped = deduplicateStockByPallet(datasetMap[k]);
+                    combined = mergeStockIntoBase(combined, deduped);
                 }
-                combined = mergeDatasets(combined, sheetData);
             });
             
             // 전체 결합 데이터에 제품 스펙 전파 백필(Backfill) 작동
