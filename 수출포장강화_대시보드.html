@@ -1343,8 +1343,10 @@
             document.getElementById('statusDropdown').classList.add('hidden');
             document.getElementById('statusDropdownArrow').style.transform = '';
 
-            // 헤더 레이블 업데이트
+            // 헤더 레이블 업데이트 (상태별 색상 일치)
             const label = document.getElementById('statusFilterLabel');
+            const colorMap = { '출고': 'text-orange-400', '피킹': 'text-purple-400', '포장완료': 'text-accentBlue', '미입고': 'text-slate-400' };
+            label.className = 'font-bold ' + (colorMap[value] || 'text-slate-400');
             if (value === '전체') {
                 label.classList.add('hidden');
             } else {
@@ -1353,7 +1355,7 @@
             }
 
             // 선택된 항목 강조
-            ['전체','출고','피킹','포장완료','포장대기','미입고'].forEach(s => {
+            ['전체','출고','피킹','포장완료','미입고'].forEach(s => {
                 const btn = document.getElementById('sf-' + s);
                 if (btn) btn.classList.toggle('bg-slate-700/60', s === value);
             });
