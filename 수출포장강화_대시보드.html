@@ -1891,7 +1891,7 @@
             const lastDateStr = absoluteLatestReceivedDate
                 ? absoluteLatestReceivedDate.toISOString().slice(0, 10)
                 : '-';
-            setVal('kpiLastReceivedDate', document.getElementById('syncTimestamp').innerText);
+            // setVal('kpiLastReceivedDate', document.getElementById('syncTimestamp').innerText);
 
             // 카드2: "충주공장 재고" 시트 — Q1=CODE, S1=EA (원본 행 직접 참조)
             const stockRows = state.rawStockRows;
