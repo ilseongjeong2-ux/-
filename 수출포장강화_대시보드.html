@@ -2053,7 +2053,7 @@
                     <td class="py-3.5 px-4 text-center font-semibold text-accentGreen">${item.strengthenedQty.toLocaleString()}</td>
                     <td class="py-3.5 px-4 text-center font-semibold text-accentOrange">${item.shippedQty.toLocaleString()}</td>
                     <td class="py-3.5 px-4 text-right font-medium text-slate-300">${item.cost.toLocaleString()}원</td>
-                    <td class="py-3.5 px-4 text-center"><span class="px-2.5 py-0.5 rounded border text-xs ${badgeClass}">${item.statusLabel || item.status}</span></td>`;
+                    <td class="py-3.5 px-4 text-center"><span class="px-2.5 py-0.5 rounded text-xs ${badgeClass}">${item.statusLabel || item.status}</span></td>`;
                 tbody.appendChild(tr);
             });
         }
