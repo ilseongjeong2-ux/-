@@ -741,19 +741,25 @@
 
             const hasRealUploads = keys.some(k => k !== 'default');
 
-            // 1단계: 수출 표준품 현황 + 출고 완료 먼저 병합
+            // 1단계: 수출 표준품 현황 + 출고 완료만 병합 (행 수 기준)
             keys.forEach(k => {
                 if (hasRealUploads && k === 'default') return;
                 if (k.includes('충주공장 재고')) return;
                 combined = mergeDatasets(combined, datasetMap[k]);
             });
 
-            // 2단계: 충주공장 재고는 파렛트 합산 후 round+code 기준으로 신규 항목만 추가
+            // 2단계: 충주공장 재고는 신규 행 추가 없이 기존 행의 진행 상태만 업데이트
             keys.forEach(k => {
-                if (k.includes('충주공장 재고')) {
-                    const deduped = deduplicateStockByPallet(datasetMap[k]);
-                    combined = mergeStockIntoBase(combined, deduped);
-                }
+                if (!k.includes('충주공장 재고')) return;
+                const deduped = deduplicateStockByPallet(datasetMap[k]);
+                const stockMap = new Map(deduped.map(item => [`${item.round}|${item.code}`, item]));
+                combined = combined.map(item => {
+                    const stockItem = stockMap.get(`${item.round}|${item.code}`);
+                    if (stockItem) {
+                        return { ...item, status: stockItem.status, statusLabel: stockItem.statusLabel };
+                    }
+                    return item;
+                });
             });
             
             // 전체 결합 데이터에 제품 스펙 전파 백필(Backfill) 작동
