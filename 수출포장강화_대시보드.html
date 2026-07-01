@@ -2447,6 +2447,8 @@
             sortConfig.key = 'regDate';
             sortConfig.direction = 'desc';
             updateSortHeaders();
+            // 상태 드롭다운 초기화
+            selectStatusFilter('전체');
             autoAdjustDateFilters();
             applyFilters();
         }
