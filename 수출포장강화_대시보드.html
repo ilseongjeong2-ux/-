@@ -2330,8 +2330,8 @@
             document.getElementById('countryFilter').value = '';
             document.getElementById('startDateFilter').value = '';
             document.getElementById('endDateFilter').value = '';
-            sortConfig.key = null;
-            sortConfig.direction = 'none';
+            sortConfig.key = 'regDate';
+            sortConfig.direction = 'desc';
             updateSortHeaders();
             autoAdjustDateFilters();
             applyFilters();
