@@ -703,15 +703,38 @@
         });
 
         // 다중 파일 로드 시 중복 행 증발 방지 및 결합 파이프라인
+        // 충주공장 재고: 파렛트 단위 중복행을 코드+건명 기준으로 수량 합산해 1행으로 통합
+        function deduplicateStockByPallet(data) {
+            const map = new Map();
+            data.forEach(item => {
+                const key = `${item.round}|${item.code}`;
+                if (map.has(key)) {
+                    const ex = map.get(key);
+                    ex.qty             = (parseInt(ex.qty)             || 0) + (parseInt(item.qty)             || 0);
+                    ex.targetQty       = (parseInt(ex.targetQty)       || 0) + (parseInt(item.targetQty)       || 0);
+                    ex.strengthenedQty = (parseInt(ex.strengthenedQty) || 0) + (parseInt(item.strengthenedQty) || 0);
+                    ex.shippedQty      = (parseInt(ex.shippedQty)      || 0) + (parseInt(item.shippedQty)      || 0);
+                } else {
+                    map.set(key, { ...item });
+                }
+            });
+            return Array.from(map.values());
+        }
+
         function combineDatasets() {
             let combined = [];
             const keys = Object.keys(datasetMap);
-            
+
             const hasRealUploads = keys.some(k => k !== 'default');
-            
+
             keys.forEach(k => {
                 if (hasRealUploads && k === 'default') return;
-                combined = mergeDatasets(combined, datasetMap[k]);
+                let sheetData = datasetMap[k];
+                // 충주공장 재고는 파렛트 중복 행을 먼저 합산 후 병합
+                if (k.includes('충주공장 재고')) {
+                    sheetData = deduplicateStockByPallet(sheetData);
+                }
+                combined = mergeDatasets(combined, sheetData);
             });
             
             // 전체 결합 데이터에 제품 스펙 전파 백필(Backfill) 작동
