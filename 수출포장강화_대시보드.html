@@ -1438,8 +1438,9 @@
                     const matchesCode = item.code ? item.code.toLowerCase().includes(productCodeQuery) : true;
                     const roundCountry = item.round ? item.round.split('-')[0].trim().toLowerCase() : '';
                     const matchesCountry = countryQuery === '' || roundCountry.includes(countryQuery);
+                    const matchesStatus = activeStatusFilter === '전체' || item.status === activeStatusFilter;
 
-                    return matchesDate && matchesRound && matchesCode && matchesCountry;
+                    return matchesDate && matchesRound && matchesCode && matchesCountry && matchesStatus;
                 });
 
                 sortData();
