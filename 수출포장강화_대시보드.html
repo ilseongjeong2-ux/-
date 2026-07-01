@@ -2326,41 +2326,69 @@
             return d.getFullYear() + '-W' + String(weekNo).padStart(2, '0');
         }
 
-        function renderPackingChart() {
-            const year = packingSelectedYear;
-            const filtered = {};
-            Object.keys(_packingDateQtyMap).forEach(function(d) {
-                if (!year || d.startsWith(year)) filtered[d] = _packingDateQtyMap[d];
-            });
+        function _dateStr(d) {
+            return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        }
 
+        function renderPackingChart() {
             let labels = [], dataArr = [];
 
             if (packingViewMode === 'daily') {
-                const sorted = Object.keys(filtered).sort();
-                labels  = sorted.map(function(d) { return d.slice(5); });
-                dataArr = sorted.map(function(d) { return filtered[d]; });
+                // 이번주 월~금 고정
+                const today = new Date();
+                const dow = today.getDay(); // 0=일
+                const toMon = dow === 0 ? -6 : 1 - dow;
+                const mon = new Date(today);
+                mon.setDate(today.getDate() + toMon);
+                const DAY = ['일','월','화','수','목','금','토'];
+                for (var i = 0; i < 5; i++) {
+                    const d = new Date(mon);
+                    d.setDate(mon.getDate() + i);
+                    const ds = _dateStr(d);
+                    labels.push((d.getMonth()+1) + '/' + d.getDate() + '(' + DAY[d.getDay()] + ')');
+                    dataArr.push(_packingDateQtyMap[ds] || 0);
+                }
 
             } else if (packingViewMode === 'weekly') {
-                const weekMap = {};
-                Object.keys(filtered).sort().forEach(function(d) {
-                    const wk = getISOWeek(d);
-                    if (!weekMap[wk]) weekMap[wk] = 0;
-                    weekMap[wk] += filtered[d];
-                });
-                const sortedWks = Object.keys(weekMap).sort();
-                labels  = sortedWks.map(function(wk) { return parseInt(wk.split('-W')[1]) + '주'; });
-                dataArr = sortedWks.map(function(wk) { return weekMap[wk]; });
+                // 이번달 주간 (월~금 기준)
+                const today = new Date();
+                const yr = today.getFullYear();
+                const mo = today.getMonth(); // 0-indexed
+                const firstOfMonth = new Date(yr, mo, 1);
+                const fdow = firstOfMonth.getDay();
+                const toMon = fdow === 0 ? -6 : 1 - fdow;
+                const wkStart = new Date(yr, mo, 1 + toMon);
+                const lastOfMonth = new Date(yr, mo + 1, 0);
+
+                while (wkStart <= lastOfMonth) {
+                    const wkFri = new Date(wkStart);
+                    wkFri.setDate(wkStart.getDate() + 4);
+                    var wkTotal = 0;
+                    for (var j = 0; j < 5; j++) {
+                        const dd = new Date(wkStart);
+                        dd.setDate(wkStart.getDate() + j);
+                        wkTotal += _packingDateQtyMap[_dateStr(dd)] || 0;
+                    }
+                    const sL = (wkStart.getMonth()+1) + '/' + wkStart.getDate();
+                    const eL = (wkFri.getMonth()+1)   + '/' + wkFri.getDate();
+                    labels.push(sL + '~' + eL);
+                    dataArr.push(wkTotal);
+                    wkStart.setDate(wkStart.getDate() + 7);
+                    if (labels.length > 7) break;
+                }
 
             } else {
-                const monthMap = {};
-                Object.keys(filtered).sort().forEach(function(d) {
-                    const mo = d.slice(0, 7);
-                    if (!monthMap[mo]) monthMap[mo] = 0;
-                    monthMap[mo] += filtered[d];
+                // 월간: 선택 연도 1~12월 전체 (데이터 없는 달도 0으로 표시)
+                const yr = packingSelectedYear || String(new Date().getFullYear());
+                const MO_LABELS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+                const totals = new Array(12).fill(0);
+                Object.keys(_packingDateQtyMap).forEach(function(d) {
+                    if (!d.startsWith(yr)) return;
+                    const mi = parseInt(d.slice(5,7)) - 1;
+                    totals[mi] += _packingDateQtyMap[d];
                 });
-                const sortedMos = Object.keys(monthMap).sort();
-                labels  = sortedMos.map(function(m) { return parseInt(m.slice(5)) + '월'; });
-                dataArr = sortedMos.map(function(m) { return monthMap[m]; });
+                labels  = MO_LABELS;
+                dataArr = totals;
             }
 
             if (trendChartInstance) { trendChartInstance.destroy(); trendChartInstance = null; }
@@ -2389,7 +2417,7 @@
                         const val = ds.data[i];
                         if (!val) return;
                         ctx.save();
-                        ctx.fillStyle = '#00E676';
+                        ctx.fillStyle = '#0284C7';
                         ctx.font = 'bold ' + (hov === i ? 10 : 8) + 'px Inter, sans-serif';
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'bottom';
@@ -2406,8 +2434,8 @@
                     datasets: [{
                         label: '강화 수량 (EA)',
                         data: dataArr,
-                        backgroundColor: 'rgba(0, 176, 255, 0.65)',
-                        borderColor: '#00B0FF',
+                        backgroundColor: 'rgba(125, 211, 252, 0.65)',
+                        borderColor: '#38BDF8',
                         borderWidth: 1.5,
                         borderRadius: 6
                     }]
@@ -2415,7 +2443,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    barPercentage: 0.55,
+                    barPercentage: packingViewMode === 'daily' ? 0.45 : 0.55,
                     categoryPercentage: 0.65,
                     layout: { padding: { top: 18 } },
                     plugins: {
@@ -2425,16 +2453,15 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: { color: '#475569', font: { size: 10 } },
-                            grid: { color: '#CBD5E1' }
+                            ticks: { color: '#64748B', font: { size: 10 } },
+                            grid: { color: '#E2E8F0' }
                         },
                         x: {
                             ticks: {
-                                color: '#475569',
-                                font: { size: 10 },
-                                maxRotation: packingViewMode === 'daily' ? 45 : 0,
-                                autoSkip: true,
-                                maxTicksLimit: packingViewMode === 'daily' ? 20 : 15
+                                color: '#64748B',
+                                font: { size: packingViewMode === 'weekly' ? 9 : 10 },
+                                maxRotation: 0,
+                                autoSkip: false
                             },
                             grid: { display: false }
                         }
