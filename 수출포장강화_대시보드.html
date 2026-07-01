@@ -2172,16 +2172,32 @@
                 },
                 plugins: [{
                     id: 'barTopLabels',
+                    _hovered: { di: -1, i: -1 },
+                    afterEvent(chart, args) {
+                        const e = args.event;
+                        if (e.type !== 'mousemove' && e.type !== 'mouseout') return;
+                        const els = e.type === 'mousemove'
+                            ? chart.getElementsAtEventForMode(e.native, 'nearest', { intersect: true }, false)
+                            : [];
+                        const ndi = els.length > 0 ? els[0].datasetIndex : -1;
+                        const ni  = els.length > 0 ? els[0].index : -1;
+                        if (ndi !== this._hovered.di || ni !== this._hovered.i) {
+                            this._hovered = { di: ndi, i: ni };
+                            args.changed = true;
+                        }
+                    },
                     afterDatasetsDraw(chart) {
                         const ctx = chart.ctx;
+                        const hov = this._hovered;
                         chart.data.datasets.forEach((dataset, di) => {
                             const meta = chart.getDatasetMeta(di);
                             meta.data.forEach((bar, i) => {
                                 const val = dataset.data[i];
                                 if (!val) return;
+                                const isHov = hov.di === di && hov.i === i;
                                 ctx.save();
                                 ctx.fillStyle = di === 0 ? '#00E676' : '#FF9100';
-                                ctx.font = 'bold 10px Inter, sans-serif';
+                                ctx.font = `bold ${isHov ? 10 : 6}px Inter, sans-serif`;
                                 ctx.textAlign = 'center';
                                 ctx.textBaseline = 'bottom';
                                 ctx.fillText(val.toLocaleString() + 'EA', bar.x, bar.y - 2);
