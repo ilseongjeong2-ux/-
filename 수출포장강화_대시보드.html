@@ -1008,16 +1008,12 @@
             let str = rawDate.toString().trim();
             if (str === '' || str === '미구성' || str === '-') return '-';
 
-            if (str.includes('T')) {
-                str = str.split('T')[0];
-            }
-
-            let parsed = new Date(str);
-            if (!isNaN(parsed.getTime()) && str.length > 8 && (str.includes('GMT') || str.includes('Korea') || str.includes('Standard'))) {
-                let y = parsed.getFullYear();
-                let m = String(parsed.getMonth() + 1).padStart(2, '0');
-                let d = String(parsed.getDate()).padStart(2, '0');
-                return `${y}-${m}-${d}`;
+            // ISO 형식("2026-06-30T15:00:00.000Z") → UTC 자르기 금지, 로컬 시간 기준 변환
+            if (str.includes('T') || str.includes('GMT') || str.includes('Korea') || str.includes('Standard')) {
+                const parsed = new Date(str);
+                if (!isNaN(parsed.getTime())) {
+                    return `${parsed.getFullYear()}-${String(parsed.getMonth()+1).padStart(2,'0')}-${String(parsed.getDate()).padStart(2,'0')}`;
+                }
             }
 
             let clean = str.replace(/[\./]/g, '-').replace(/\s+/g, '');
