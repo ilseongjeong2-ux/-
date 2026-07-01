@@ -741,25 +741,44 @@
 
             const hasRealUploads = keys.some(k => k !== 'default');
 
-            // 1단계: 수출 표준품 현황 + 출고 완료를 round+code 기준으로 중복 없이 병합
-            const baseMap = new Map();
             const statusPriority = { '출고완료': 4, '포장완료': 3, '포장대기': 2, '미입고': 1 };
+
+            // 1단계: 수출 표준품 현황을 베이스로 로드 (행 구조 그대로 유지)
             keys.forEach(k => {
                 if (hasRealUploads && k === 'default') return;
-                if (k.includes('충주공장 재고')) return;
+                if (k.includes('충주공장 재고') || k.includes('출고 완료')) return;
+                combined = [...combined, ...(datasetMap[k] || []).map(item => ({ ...item }))];
+            });
+
+            // round+code 기준 인덱스 맵 생성
+            const buildIndexMap = (arr) => {
+                const map = new Map();
+                arr.forEach((item, idx) => {
+                    const key = `${item.round}|${item.code}`;
+                    if (!map.has(key)) map.set(key, idx);
+                });
+                return map;
+            };
+
+            // 2단계: 출고 완료 — 겹치는 round+code면 상태만 갱신, 없는 항목만 추가
+            keys.forEach(k => {
+                if (!k.includes('출고 완료')) return;
+                const idxMap = buildIndexMap(combined);
                 (datasetMap[k] || []).forEach(item => {
                     const key = `${item.round}|${item.code}`;
-                    if (!baseMap.has(key)) {
-                        baseMap.set(key, { ...item });
-                    } else {
-                        const ex = baseMap.get(key);
+                    if (idxMap.has(key)) {
+                        const ex = combined[idxMap.get(key)];
                         const pEx = statusPriority[ex.status] || 0;
                         const pNew = statusPriority[item.status] || 0;
-                        if (pNew >= pEx) baseMap.set(key, { ...ex, ...item });
+                        if (pNew > pEx) {
+                            combined[idxMap.get(key)] = { ...ex, status: item.status, statusLabel: item.statusLabel };
+                        }
+                    } else {
+                        combined.push({ ...item });
+                        idxMap.set(key, combined.length - 1);
                     }
                 });
             });
-            combined = Array.from(baseMap.values());
 
             // 2단계: 충주공장 재고는 신규 행 추가 없이 기존 행의 진행 상태만 업데이트
             keys.forEach(k => {
