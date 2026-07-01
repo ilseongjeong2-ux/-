@@ -2147,50 +2147,16 @@
                     maintainAspectRatio: false,
                     onClick: (event, activeElements) => {
                         if (activeElements.length > 0) {
-                            const activeElement = activeElements[0];
-                            const index = activeElement.index;
-                            const datasetIndex = activeElement.datasetIndex;
-                            
+                            const index = activeElements[0].index;
+                            const datasetIndex = activeElements[0].datasetIndex;
                             const country = exportRoundChartInstance.data.labels[index];
                             const statusType = exportRoundChartInstance.data.datasets[datasetIndex].label;
-                            
                             openChartDetailModal(country, statusType);
                         }
                     },
                     plugins: {
                         legend: { labels: { color: '#94A3B8', font: { size: 10 } } },
-                        tooltip: {
-                            mode: 'nearest',       
-                            intersect: true,      
-                            backgroundColor: '#111827',
-                            titleColor: '#00B0FF',
-                            titleFont: { weight: 'bold', size: 14 },
-                            bodyColor: '#F1F5F9',
-                            bodyFont: { size: 13, weight: 'bold', family: 'Inter, Noto Sans KR, sans-serif' },
-                            footerColor: '#00B0FF', 
-                            footerFont: { size: 11, weight: 'bold', family: 'Inter, Noto Sans KR, sans-serif' },
-                            footerMarginTop: 8,
-                            borderColor: '#1E293B',
-                            borderWidth: 1.5,
-                            padding: 12,
-                            cornerRadius: 8,
-                            displayColors: false, 
-                            callbacks: {
-                                title: function(context) {
-                                    const index = context[0].dataIndex;
-                                    const country = context[0].chart.data.labels[index];
-                                    const datasetLabel = context[0].dataset.label;
-                                    return country + " - [" + datasetLabel + "]";
-                                },
-                                label: function(context) {
-                                    const totalValue = context.raw;
-                                    return "총 실적 합산: " + totalValue.toLocaleString() + " ea";
-                                },
-                                footer: function() {
-                                    return "💡 마우스 클릭 시 세부 차수 정보 표출";
-                                }
-                            }
-                        }
+                        tooltip: { enabled: false }
                     },
                     scales: {
                         y: {
@@ -2203,7 +2169,27 @@
                             grid: { display: false }
                         }
                     }
-                }
+                },
+                plugins: [{
+                    id: 'barTopLabels',
+                    afterDatasetsDraw(chart) {
+                        const ctx = chart.ctx;
+                        chart.data.datasets.forEach((dataset, di) => {
+                            const meta = chart.getDatasetMeta(di);
+                            meta.data.forEach((bar, i) => {
+                                const val = dataset.data[i];
+                                if (!val) return;
+                                ctx.save();
+                                ctx.fillStyle = di === 0 ? '#00E676' : '#FF9100';
+                                ctx.font = 'bold 10px Inter, sans-serif';
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'bottom';
+                                ctx.fillText(val.toLocaleString() + 'EA', bar.x, bar.y - 2);
+                                ctx.restore();
+                            });
+                        });
+                    }
+                }]
             });
 
             // 일별 가동 흐름 연산 - 출고 완료 시트(rawShippedRows) 기준
