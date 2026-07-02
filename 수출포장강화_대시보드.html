@@ -3191,9 +3191,11 @@
 
         // ─── 작업 인원 등록 모달 ─────────────────────────────────────
         let _wrmWorkers = [];  // 모달 임시 작업자 목록
+        let _wrmCount = 0;     // 인원 수 (이름 추가 시 자동 증가, 수동 조정 가능)
 
         function openWorkerRegisterModal() {
             _wrmWorkers = [];
+            _wrmCount = 0;
             const modal = document.getElementById('workerRegisterModal');
             const dateInp = document.getElementById('wrm_date');
             const deptInp = document.getElementById('wrm_dept');
@@ -3204,6 +3206,7 @@
             if (memoInp) memoInp.value = '';
             if (statusEl) { statusEl.classList.add('hidden'); statusEl.textContent = ''; }
             _wrmRenderChips();
+            _wrmRenderCount();
             const btn = document.getElementById('wrm_submitBtn');
             if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
             modal.classList.remove('hidden');
@@ -3214,26 +3217,44 @@
             document.getElementById('workerRegisterModal').classList.add('hidden');
         }
 
+        function wrmSetCount(delta) {
+            _wrmCount = Math.max(0, _wrmCount + delta);
+            // 이름이 더 많이 추가되어 있으면 count는 이름 수 이하로 내려가지 않음
+            if (_wrmCount < _wrmWorkers.length) _wrmCount = _wrmWorkers.length;
+            _wrmRenderCount();
+        }
+
+        function _wrmRenderCount() {
+            const el = document.getElementById('wrm_countDisplay');
+            if (el) el.textContent = _wrmCount;
+        }
+
         function wrmAddWorker() {
             const inp = document.getElementById('wrm_workerInput');
             const name = inp ? inp.value.trim() : '';
             if (!name || _wrmWorkers.includes(name)) { if (inp) inp.value = ''; return; }
             _wrmWorkers.push(name);
+            if (_wrmCount < _wrmWorkers.length) _wrmCount = _wrmWorkers.length;
             if (inp) inp.value = '';
             _wrmRenderChips();
+            _wrmRenderCount();
             inp.focus();
         }
 
         function wrmRemoveWorker(idx) {
             _wrmWorkers.splice(idx, 1);
+            if (_wrmCount > _wrmWorkers.length && _wrmCount > 0) {
+                // 수동으로 올렸던 count는 유지, 이름 삭제해도 count는 그대로
+            }
             _wrmRenderChips();
+            _wrmRenderCount();
         }
 
         function _wrmRenderChips() {
             const container = document.getElementById('wrm_workerChips');
             if (!container) return;
             if (!_wrmWorkers.length) {
-                container.innerHTML = '<span style="font-size:12px;color:#475569;">추가된 작업자 없음</span>';
+                container.innerHTML = '<span style="font-size:12px;color:#475569;">이름 입력 없이 인원 수만으로도 등록 가능</span>';
                 return;
             }
             container.innerHTML = _wrmWorkers.map((w, i) =>
@@ -3256,7 +3277,7 @@
             const btn   = document.getElementById('wrm_submitBtn');
 
             if (!dept) { _wrmShowStatus('부서명을 입력하세요.', '#F59E0B'); return; }
-            if (!_wrmWorkers.length) { _wrmShowStatus('작업자를 1명 이상 추가하세요.', '#F59E0B'); return; }
+            if (_wrmCount === 0) { _wrmShowStatus('인원 수를 1명 이상으로 설정하세요.', '#F59E0B'); return; }
 
             // localStorage 저장
             const logs = getWorkerLogs();
@@ -3265,6 +3286,7 @@
                 id: now.getTime().toString(),
                 date,
                 dept,
+                count: _wrmCount,
                 workers: [..._wrmWorkers],
                 memo,
                 registeredAt: date + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0')
