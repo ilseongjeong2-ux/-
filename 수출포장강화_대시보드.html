@@ -1138,6 +1138,12 @@
             return '-';
         }
 
+        // 날짜에서 연도 제거 (YYYY-MM-DD → MM-DD)
+        function shortDate(rawDate) {
+            const d = normalizeDate(rawDate);
+            return (d && d !== '-' && d.length >= 7) ? d.slice(5) : d;
+        }
+
         // [동적 지능형 시트 데이터 매퍼]
         function mapCSVData(csvRows) {
             if (csvRows.length < 2) return [];
