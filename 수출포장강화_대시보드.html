@@ -2613,17 +2613,31 @@
         }
 
         function updatePackingNavArrows() {
+            const row  = document.getElementById('packingNavRow');
             const prev = document.getElementById('packingNavPrev');
             const next = document.getElementById('packingNavNext');
-            if (!prev || !next) return;
+            const lbl  = document.getElementById('packingNavLabel');
+            if (!prev || !next || !row) return;
 
             if (packingViewMode === 'monthly') {
-                prev.style.visibility = 'hidden';
-                next.style.visibility = 'hidden';
+                row.style.display = 'none';
                 return;
             }
-            prev.style.visibility = 'visible';
-            next.style.visibility = 'visible';
+            row.style.display = 'flex';
+
+            const today = new Date();
+            if (packingViewMode === 'daily') {
+                const mon = new Date(today);
+                const toMon = (today.getDay() === 0 ? -6 : 1 - today.getDay());
+                mon.setDate(today.getDate() + toMon + packingDailyWeekOffset * 7);
+                const fri = new Date(mon); fri.setDate(mon.getDate() + 4);
+                const mo  = mon.getMonth() + 1;
+                const wkInMon = Math.ceil(mon.getDate() / 7);
+                if (lbl) lbl.textContent = mo + '월 ' + wkInMon + '주차 (' + mo + '/' + mon.getDate() + '~' + (fri.getMonth()+1) + '/' + fri.getDate() + ')';
+            } else {
+                const t = new Date(today.getFullYear(), today.getMonth() + packingWeeklyMonthOffset, 1);
+                if (lbl) lbl.textContent = t.getFullYear() + '년 ' + (t.getMonth()+1) + '월';
+            }
 
             const atCurrent = packingViewMode === 'daily'
                 ? packingDailyWeekOffset >= 0
