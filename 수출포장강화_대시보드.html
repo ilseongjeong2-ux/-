@@ -1657,26 +1657,72 @@
 
             document.getElementById('detailProductCode').innerText = productCode.toUpperCase();
 
-            const matchItem = state.filteredData.find(item => item.code.toLowerCase() === productCode.toLowerCase() && (item.specW && item.specW !== '-' || item.specD && item.specD !== '-' || item.specH && item.specH !== '-' || item.specG && item.specG !== '-')) 
-                             || state.data.find(item => item.code.toLowerCase() === productCode.toLowerCase() && (item.specW && item.specW !== '-' || item.specD && item.specD !== '-' || item.specH && item.specH !== '-' || item.specG && item.specG !== '-'))
-                             || state.filteredData.find(item => item.code.toLowerCase() === productCode.toLowerCase()) 
-                             || state.data.find(item => item.code.toLowerCase() === productCode.toLowerCase());
-
             const stripUnit = (val) => {
                 if (!val || val === '-') return '-';
                 return val.toString().trim().replace(/[a-zA-Z가-힣]+$/g, '').trim() || '-';
             };
-            if (matchItem) {
-                document.getElementById('specW').innerText = stripUnit(matchItem.specW);
-                document.getElementById('specD').innerText = stripUnit(matchItem.specD);
-                document.getElementById('specH').innerText = stripUnit(matchItem.specH);
-                document.getElementById('specG').innerText = stripUnit(matchItem.specG);
-            } else {
-                document.getElementById('specW').innerText = '-';
-                document.getElementById('specD').innerText = '-';
-                document.getElementById('specH').innerText = '-';
-                document.getElementById('specG').innerText = '-';
+
+            // 동일 제품코드의 전체 데이터에서 스펙 통계 계산
+            const allSpecItems = state.data.filter(item =>
+                item.code.toLowerCase() === productCode.toLowerCase()
+            );
+
+            const getSpecStats = (field) => {
+                const vals = allSpecItems.map(i => parseFloat(stripUnit(i[field]))).filter(v => !isNaN(v) && v > 0);
+                if (!vals.length) return { avg: '-', tol: null, count: 0 };
+                const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+                const min = Math.min(...vals);
+                const max = Math.max(...vals);
+                const tol = (max - min) / 2;
+                const fmt = (n) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(1);
+                return { avg: fmt(avg), tol: fmt(tol), count: vals.length };
+            };
+
+            const wS = getSpecStats('specW');
+            const dS = getSpecStats('specD');
+            const hS = getSpecStats('specH');
+            const gS = getSpecStats('specG');
+
+            // CBM = W × D × H / 1,000,000,000 (mm³ → m³)
+            const cbmVals = allSpecItems.map(i => {
+                const w = parseFloat(stripUnit(i.specW));
+                const d = parseFloat(stripUnit(i.specD));
+                const h = parseFloat(stripUnit(i.specH));
+                if (isNaN(w) || isNaN(d) || isNaN(h) || w <= 0 || d <= 0 || h <= 0) return NaN;
+                return (w * d * h) / 1e9;
+            }).filter(v => !isNaN(v));
+
+            let cbmAvg = '-', cbmTol = null, cbmCount = 0;
+            if (cbmVals.length) {
+                const avg = cbmVals.reduce((a, b) => a + b, 0) / cbmVals.length;
+                const min = Math.min(...cbmVals);
+                const max = Math.max(...cbmVals);
+                cbmAvg = avg.toFixed(4);
+                cbmTol = ((max - min) / 2).toFixed(4);
+                cbmCount = cbmVals.length;
             }
+
+            const renderTol = (tol, isZero) => {
+                if (tol === null) return '<span class="text-slate-600">-</span>';
+                const n = parseFloat(tol);
+                if (n === 0 || isZero) return '<span style="color:#22C55E;">±0 균일</span>';
+                return '<span style="color:#F59E0B;">±' + tol + '</span>';
+            };
+
+            document.getElementById('specW').innerText = wS.avg;
+            document.getElementById('specD').innerText = dS.avg;
+            document.getElementById('specH').innerText = hS.avg;
+            document.getElementById('specG').innerText = gS.avg;
+            document.getElementById('specCBM').innerText = cbmAvg;
+
+            document.getElementById('specWTol').innerHTML = renderTol(wS.tol, wS.tol === '0');
+            document.getElementById('specDTol').innerHTML = renderTol(dS.tol, dS.tol === '0');
+            document.getElementById('specHTol').innerHTML = renderTol(hS.tol, hS.tol === '0');
+            document.getElementById('specGTol').innerHTML = renderTol(gS.tol, gS.tol === '0');
+            document.getElementById('specCBMTol').innerHTML = renderTol(cbmTol, cbmTol === '0.0000');
+
+            const sampleN = Math.max(wS.count, dS.count, hS.count, gS.count, cbmCount);
+            document.getElementById('specSampleCount').innerText = sampleN > 0 ? '(n=' + sampleN + ' 작업 기록 기준)' : '';
 
             detailSortConfig.key = null;
             detailSortConfig.direction = 'none';
