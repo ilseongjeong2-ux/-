@@ -2480,8 +2480,9 @@
                 const mo = targetDate.getMonth();
                 const firstOfMonth = new Date(yr, mo, 1);
                 const fdow = firstOfMonth.getDay();
-                const toMon = fdow === 0 ? -6 : 1 - fdow;
-                const wkStart = new Date(yr, mo, 1 + toMon);
+                // 주 소속은 월요일 기준: 해당 달의 첫 번째 월요일부터 시작
+                const daysToFirstMon = fdow === 1 ? 0 : fdow === 0 ? 1 : 8 - fdow;
+                const wkStart = new Date(yr, mo, 1 + daysToFirstMon);
                 const lastOfMonth = new Date(yr, mo + 1, 0);
 
                 while (wkStart <= lastOfMonth) {
