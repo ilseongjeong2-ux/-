@@ -3295,7 +3295,8 @@
                 id: now.getTime().toString(),
                 date,
                 dept,
-                count: _wrmCount,
+                count: _wrmWorkers.length + _wrmCount,   // 총인원 = 이름있는 인원 + 외 N명
+                extraCount: _wrmCount,                   // 용역으로 들어갈 추가 인원 수
                 workers: [..._wrmWorkers],
                 memo,
                 registeredAt: date + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0')
