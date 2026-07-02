@@ -2446,7 +2446,8 @@
                 const dow = today.getDay();
                 const toMon = dow === 0 ? -6 : 1 - dow;
                 const mon = new Date(today);
-                mon.setDate(today.getDate() + toMon);
+                // 이번주 월요일 + 주 오프셋 적용
+                mon.setDate(today.getDate() + toMon + packingDailyWeekOffset * 7);
                 const DAY = ['일','월','화','수','목','금','토'];
                 for (var i = 0; i < 5; i++) {
                     const d = new Date(mon);
@@ -2460,8 +2461,10 @@
 
             } else if (packingViewMode === 'weekly') {
                 const today = new Date();
-                const yr = today.getFullYear();
-                const mo = today.getMonth();
+                // 월 오프셋 적용
+                const targetDate = new Date(today.getFullYear(), today.getMonth() + packingWeeklyMonthOffset, 1);
+                const yr = targetDate.getFullYear();
+                const mo = targetDate.getMonth();
                 const firstOfMonth = new Date(yr, mo, 1);
                 const fdow = firstOfMonth.getDay();
                 const toMon = fdow === 0 ? -6 : 1 - fdow;
