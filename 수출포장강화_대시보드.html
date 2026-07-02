@@ -3179,9 +3179,13 @@
             let totalCount = 0;
             todayLogs.forEach(r => {
                 const dept = r.dept || '미지정';
-                if (!deptMap[dept]) deptMap[dept] = { count: 0, workers: [] };
-                const cnt = r.count || r.workers.length || 0;
+                if (!deptMap[dept]) deptMap[dept] = { count: 0, workers: [], extraCount: 0 };
+                // count = 이름있는 인원 + 외(extraCount) 합산
+                const named = r.workers.length || 0;
+                const extra = r.extraCount || 0;
+                const cnt = r.count || (named + extra) || named || 0;
                 deptMap[dept].count += cnt;
+                deptMap[dept].extraCount += extra;
                 totalCount += cnt;
                 r.workers.forEach(w => { if (!deptMap[dept].workers.includes(w)) deptMap[dept].workers.push(w); });
             });
@@ -3191,7 +3195,10 @@
                 <span style="font-size:11px;color:#475569;">작업 참여</span>
             </div>`;
             Object.entries(deptMap).forEach(([dept, info]) => {
-                const nameStr = info.workers.length ? info.workers.join(' · ') : info.count + '명';
+                // 이름있는 인원 표시 + 외N명(용역)이 있으면 "용역 N명" 추가
+                let nameParts = [...info.workers];
+                if (info.extraCount > 0) nameParts.push('용역 ' + info.extraCount + '명');
+                const nameStr = nameParts.length ? nameParts.join(' · ') : info.count + '명';
                 html += `<div style="margin-bottom:4px;">
                     <span style="font-size:11px;color:#64748B;font-weight:600;">${dept}</span>
                     <span style="font-size:11px;color:#475569;margin:0 4px;">·</span>
