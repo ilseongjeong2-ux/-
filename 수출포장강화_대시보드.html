@@ -3159,6 +3159,12 @@
             sv('card1PendingItems', pendingCount);
         }
 
+        function resetTodayWorkers() {
+            const logs = getWorkerLogs().filter(r => r.date !== _todayStr());
+            saveWorkerLogs(logs);
+            renderCard1WorkerDisplay();
+        }
+
         // 오늘 작업 인원 카드 표시
         function renderCard1WorkerDisplay() {
             const display = document.getElementById('card1WorkerDisplay');
