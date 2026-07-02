@@ -2179,7 +2179,7 @@
                     const row = shippedSheetRows[i];
                     if (!row || row.every(c => !c || c.toString().trim() === '')) continue;
 
-                    const label    = row[0] ? row[0].toString().trim() : '';
+                    const label    = (row[0] ? row[0].toString().trim() : '').replace(/\s+/g, '');
                     if (!label) continue;
 
                     const roundVal = row[4] ? row[4].toString().trim() : '';
