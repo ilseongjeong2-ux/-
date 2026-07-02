@@ -3242,7 +3242,7 @@
             const name = inp ? inp.value.trim() : '';
             if (!name || _wrmWorkers.includes(name)) { if (inp) inp.value = ''; return; }
             _wrmWorkers.push(name);
-            if (_wrmCount < _wrmWorkers.length) _wrmCount = _wrmWorkers.length;
+            // 외 N명은 추가 무명 인원 — 이름 추가해도 count(외) 건드리지 않음
             if (inp) inp.value = '';
             _wrmRenderChips();
             const _ci = document.getElementById('wrm_countInput'); if (_ci) _ci.value = _wrmCount;
