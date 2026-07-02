@@ -3004,6 +3004,26 @@
             URL.revokeObjectURL(url);
         }
 
+        function exportDetailPanelCSV() {
+            if (!_currentDetailProductCode) return;
+            const matchedList = state.data.filter(item => item.code.toLowerCase() === _currentDetailProductCode.toLowerCase());
+            if (matchedList.length === 0) return;
+            const headers = ['등록일자(포장일)', '건명', '제품코드', '컬러', '수량', '진행', '납기일', '상차일'];
+            const rows = matchedList.map(item => [
+                normalizeDate(item.regDate), item.round, item.code,
+                item.color || 'WW', item.qty, item.statusLabel || item.status,
+                normalizeDate(item.dueDate), normalizeDate(item.date)
+            ]);
+            const csvContent = [headers, ...rows].map(r => r.map(v => '"' + (v == null ? '' : v) + '"').join(',')).join('\n');
+            const blob = new Blob(['﻿' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '제품상세이력_' + _currentDetailProductCode + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
         // 가져온 데이터가 올바른 시트인지 검증 (제품코드·수량·건명 중 2개 이상 있어야 통과)
         function isValidSheetData(mapped) {
             if (!mapped || mapped.length === 0) return false;
