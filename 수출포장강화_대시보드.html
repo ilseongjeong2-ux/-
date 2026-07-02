@@ -3217,16 +3217,11 @@
             document.getElementById('workerRegisterModal').classList.add('hidden');
         }
 
-        function wrmSetCount(delta) {
-            _wrmCount = Math.max(0, _wrmCount + delta);
-            // 이름이 더 많이 추가되어 있으면 count는 이름 수 이하로 내려가지 않음
-            if (_wrmCount < _wrmWorkers.length) _wrmCount = _wrmWorkers.length;
-            _wrmRenderCount();
-        }
-
-        function _wrmRenderCount() {
-            const el = document.getElementById('wrm_countDisplay');
-            if (el) el.textContent = _wrmCount;
+        function wrmSyncCount(val) {
+            const n = Math.max(0, parseInt(val) || 0);
+            _wrmCount = n;
+            const inp = document.getElementById('wrm_countInput');
+            if (inp && parseInt(inp.value) !== n) inp.value = n;
         }
 
         function wrmAddWorker() {
