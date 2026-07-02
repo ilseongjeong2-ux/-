@@ -3233,7 +3233,7 @@
             if (_wrmCount < _wrmWorkers.length) _wrmCount = _wrmWorkers.length;
             if (inp) inp.value = '';
             _wrmRenderChips();
-            _wrmRenderCount();
+            const _ci = document.getElementById('wrm_countInput'); if (_ci) _ci.value = _wrmCount;
             inp.focus();
         }
 
@@ -3243,7 +3243,7 @@
                 // 수동으로 올렸던 count는 유지, 이름 삭제해도 count는 그대로
             }
             _wrmRenderChips();
-            _wrmRenderCount();
+            const _ci = document.getElementById('wrm_countInput'); if (_ci) _ci.value = _wrmCount;
         }
 
         function _wrmRenderChips() {
