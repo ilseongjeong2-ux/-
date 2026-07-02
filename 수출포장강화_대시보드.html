@@ -3272,8 +3272,9 @@
             const statusEl = document.getElementById('wrm_status');
             const btn   = document.getElementById('wrm_submitBtn');
 
+            _wrmCount = parseInt(document.getElementById('wrm_countInput')?.value || '0') || _wrmCount;
             if (!dept) { _wrmShowStatus('부서명을 입력하세요.', '#F59E0B'); return; }
-            if (_wrmCount === 0) { _wrmShowStatus('인원 수를 1명 이상으로 설정하세요.', '#F59E0B'); return; }
+            if (_wrmCount === 0) { _wrmShowStatus('인원 수를 1명 이상으로 입력하세요.', '#F59E0B'); return; }
 
             // localStorage 저장
             const logs = getWorkerLogs();
