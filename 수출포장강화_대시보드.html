@@ -3004,7 +3004,7 @@
                 for (let i = 1; i < shippedRows.length; i++) {
                     const row = shippedRows[i];
                     if (!row || row.every(c => !c || c.toString().trim() === '')) continue;
-                    const cat = (row[0]||'').toString().trim();
+                    const cat = (row[0]||'').toString().trim().replace(/\s+/g, '');
                     if (cat !== country) continue;
 
                     const round    = (row[siRound]||'').toString().trim() || '-';
