@@ -339,7 +339,15 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="bg-panelBg border border-borderSlate rounded-xl p-5 shadow-lg flex flex-col">
-                        <div class="grid items-center mb-3" style="grid-template-columns:1fr auto 1fr">
+                        <div class="grid items-center mb-3" style="grid-template-columns:auto 1fr auto 1fr auto;gap:6px">
+                            <!-- 이전 화살표 -->
+                            <button id="packingNavPrev" onclick="navigatePackingChart(-1)"
+                                style="visibility:hidden;display:flex;align-items:center;justify-content:center;
+                                       background:rgba(148,163,184,0.22);border:1px solid rgba(148,163,184,0.35);color:#64748B;
+                                       border-radius:7px;width:26px;height:26px;font-size:18px;line-height:1;cursor:pointer;
+                                       transform:scale(1);transition:background 0.18s,color 0.18s,transform 0.18s;user-select:none;flex-shrink:0;"
+                                onmouseenter="this.style.background='rgba(148,163,184,0.42)';this.style.color='#334155';this.style.transform='scale(1.12)';"
+                                onmouseleave="this.style.background='rgba(148,163,184,0.22)';this.style.color='#64748B';this.style.transform='scale(1)';">‹</button>
                             <h3 class="text-[16px] font-bold text-white flex items-center gap-1.5">
                                 <i class="fa-solid fa-chart-column text-accentBlue"></i> 포장 강화 현황
                             </h3>
@@ -369,25 +377,19 @@
                                     <i class="fa-solid fa-download text-[12px]"></i> 데이터 출력
                                 </button>
                             </div>
+                            <!-- 다음 화살표 -->
+                            <button id="packingNavNext" onclick="navigatePackingChart(1)"
+                                style="visibility:hidden;display:flex;align-items:center;justify-content:center;
+                                       background:rgba(148,163,184,0.22);border:1px solid rgba(148,163,184,0.35);color:#64748B;
+                                       border-radius:7px;width:26px;height:26px;font-size:18px;line-height:1;cursor:not-allowed;
+                                       transform:scale(1);opacity:0.35;transition:background 0.18s,color 0.18s,transform 0.18s,opacity 0.18s;user-select:none;flex-shrink:0;"
+                                onmouseenter="if(this.style.cursor!=='not-allowed'){this.style.background='rgba(148,163,184,0.42)';this.style.color='#334155';this.style.transform='scale(1.12)';}"
+                                onmouseleave="if(this.style.cursor!=='not-allowed'){this.style.background='rgba(148,163,184,0.22)';this.style.color='#64748B';this.style.transform='scale(1)';}">›</button>
                         </div>
                         <div class="relative h-72 w-full" style="overflow:hidden;">
-                            <button id="packingNavPrev" onclick="navigatePackingChart(-1)"
-                                style="display:none;position:absolute;left:0;top:50%;transform:translateY(-50%) scale(1);z-index:10;
-                                       background:rgba(148,163,184,0.10);border:1px solid rgba(148,163,184,0.18);color:#94A3B8;
-                                       border-radius:8px;width:28px;height:48px;font-size:22px;line-height:1;cursor:pointer;
-                                       align-items:center;justify-content:center;transition:background 0.18s,color 0.18s,transform 0.18s;user-select:none;"
-                                onmouseenter="this.style.background='rgba(148,163,184,0.28)';this.style.color='#475569';this.style.transform='translateY(-50%) scale(1.13)';"
-                                onmouseleave="this.style.background='rgba(148,163,184,0.10)';this.style.color='#94A3B8';this.style.transform='translateY(-50%) scale(1)';">‹</button>
                             <div id="packingChartWrap" style="position:absolute;inset:0;transition:opacity 0.25s ease,transform 0.25s ease;">
                                 <canvas id="trendChart"></canvas>
                             </div>
-                            <button id="packingNavNext" onclick="navigatePackingChart(1)"
-                                style="display:none;position:absolute;right:0;top:50%;transform:translateY(-50%) scale(1);z-index:10;
-                                       background:rgba(148,163,184,0.10);border:1px solid rgba(148,163,184,0.18);color:#94A3B8;
-                                       border-radius:8px;width:28px;height:48px;font-size:22px;line-height:1;cursor:not-allowed;
-                                       align-items:center;justify-content:center;opacity:0.25;transition:background 0.18s,color 0.18s,transform 0.18s,opacity 0.18s;user-select:none;"
-                                onmouseenter="if(this.style.cursor!=='not-allowed'){this.style.background='rgba(148,163,184,0.28)';this.style.color='#475569';this.style.transform='translateY(-50%) scale(1.13)';}"
-                                onmouseleave="if(this.style.cursor!=='not-allowed'){this.style.background='rgba(148,163,184,0.10)';this.style.color='#94A3B8';this.style.transform='translateY(-50%) scale(1)';}">›</button>
                         </div>
                     </div>
 
