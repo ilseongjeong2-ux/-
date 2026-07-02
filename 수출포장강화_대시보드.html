@@ -2275,6 +2275,22 @@
                             const country = exportRoundChartInstance.data.labels[index];
                             const statusType = exportRoundChartInstance.data.datasets[datasetIndex].label;
                             openChartDetailModal(country, statusType);
+                        } else {
+                            // 바가 너무 작아 히트 실패 시 x축 레이블 영역 클릭 감지
+                            const chart = exportRoundChartInstance;
+                            if (!chart) return;
+                            const rect = chart.canvas.getBoundingClientRect();
+                            const xPos = event.native.clientX - rect.left;
+                            const scale = chart.scales.x;
+                            if (!scale) return;
+                            for (let i = 0; i < scale.ticks.length; i++) {
+                                const px = scale.getPixelForTick(i);
+                                if (Math.abs(xPos - px) < (scale.width / scale.ticks.length) / 2) {
+                                    const country = chart.data.labels[i];
+                                    openChartDetailModal(country, '강화완료');
+                                    break;
+                                }
+                            }
                         }
                     },
                     plugins: {
