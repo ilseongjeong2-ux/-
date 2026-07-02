@@ -857,11 +857,12 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             loadSavedSettings();
-            
+            initCard1();
+
             // 1. 페이지 로딩 즉시 데모 데이터 세팅
             datasetMap['default'] = [...initialData];
             combineDatasets();
-            
+
             // 2. 실시간 스프레드시트 갱신 시도 (초기에는 반응속도 극대화를 위해 1.5초 이내 타임아웃 가동)
             syncWithGoogleSheets(true);
         });
