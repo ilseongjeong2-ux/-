@@ -255,22 +255,24 @@
         <div id="generalDashboardView" class="flex flex-col gap-4 lg:col-start-2 lg:col-span-3 lg:row-start-1">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <!-- 카드1: 금일 작업 계획 -->
-                    <div id="remainingStatusCard" class="bg-panelBg border border-borderSlate rounded-3xl p-4 shadow-xl flex flex-col gap-2.5">
-                        <!-- 헤더 -->
-                        <div class="flex items-center justify-between">
-                            <p class="text-[14.5px] font-semibold text-slate-400 flex items-center gap-1.5">
-                                <i class="fa-solid fa-calendar-day text-accentBlue"></i> 금일 작업 계획
-                            </p>
-                            <span id="card1TodayDateLabel" class="text-[12px] text-slate-500 font-mono">-</span>
-                        </div>
-                        <!-- 포장대기 단일 박스 -->
-                        <div class="bg-darkBg/50 rounded-xl p-2.5 border border-borderSlate/40 text-center">
-                            <div class="text-[13.5px] text-slate-500 mb-0.5">포장대기</div>
-                            <div class="flex items-end justify-center gap-1">
-                                <span id="card1PendingQty" class="text-[23px] font-bold text-accentOrange">-</span>
-                                <span class="text-[13.5px] text-slate-500 mb-0.5">EA</span>
+                    <div id="remainingStatusCard" class="bg-panelBg border border-borderSlate rounded-3xl p-4 shadow-xl flex flex-col gap-3">
+                        <!-- 헤더 (크게) -->
+                        <div>
+                            <div class="flex items-center justify-between mb-0.5">
+                                <p class="text-[17.5px] font-bold text-slate-200 flex items-center gap-2">
+                                    <i class="fa-solid fa-calendar-day text-accentBlue text-[16px]"></i> 금일 작업 계획
+                                </p>
+                                <span id="card1TodayDateLabel" class="text-[13.5px] text-slate-400 font-mono font-semibold">-</span>
                             </div>
-                            <div class="text-[13.5px] text-slate-600"><span id="card1PendingItems">-</span>건</div>
+                        </div>
+                        <!-- 포장대기 한 줄 -->
+                        <div class="flex items-center gap-2 bg-darkBg/50 rounded-xl px-3 py-2 border border-borderSlate/40">
+                            <span class="text-[13.5px] text-slate-500 font-semibold shrink-0">포장대기</span>
+                            <span class="text-slate-600 text-[13px]">—</span>
+                            <span id="card1PendingQty" class="text-[21.5px] font-bold text-accentOrange leading-none">-</span>
+                            <span class="text-[13.5px] text-slate-500 font-semibold">EA</span>
+                            <span class="text-slate-600 text-[13px]">·</span>
+                            <span class="text-[13.5px] text-slate-500"><span id="card1PendingItems">-</span>건</span>
                         </div>
                         <!-- 작업 인원 -->
                         <div class="flex flex-col gap-1.5">
@@ -282,8 +284,7 @@
                                     <i class="fa-solid fa-plus text-[10px]"></i> 등록
                                 </button>
                             </div>
-                            <!-- 오늘 등록된 작업자 표시 -->
-                            <div id="card1WorkerDisplay" class="min-h-[36px]">
+                            <div id="card1WorkerDisplay" class="min-h-[28px]">
                                 <div class="text-[12px] text-slate-600 text-center py-1">등록된 작업 인원이 없습니다</div>
                             </div>
                         </div>
