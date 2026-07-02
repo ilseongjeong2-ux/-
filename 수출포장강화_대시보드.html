@@ -572,14 +572,17 @@
                         <table class="min-w-max w-full text-left border-collapse text-[16px]">
                             <thead>
                                 <tr class="bg-darkBg/60 text-slate-400 font-semibold uppercase tracking-wider border-b border-borderSlate/60 select-none whitespace-nowrap">
-                                    <th class="py-3 px-3 text-center w-10">*</th>
-                                    <th onclick="handleDetailSort('round')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition-colors">
-                                        차수 <span id="detail-sort-icon-round" class="text-[12px] ml-0.5 text-slate-500"><i class="fa-solid fa-sort"></i></span>
+                                    <th onclick="handleDetailSort('regDate')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition-colors text-center">
+                                        등록일자(포장일) <span id="detail-sort-icon-regDate" class="text-[12px] ml-0.5 text-slate-500"><i class="fa-solid fa-sort"></i></span>
                                     </th>
-                                    <th onclick="handleDetailSort('code')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition-colors">
+                                    <th class="py-3 px-3 text-center w-10">*</th>
+                                    <th onclick="handleDetailSort('round')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition-colors text-center">
+                                        건명 <span id="detail-sort-icon-round" class="text-[12px] ml-0.5 text-slate-500"><i class="fa-solid fa-sort"></i></span>
+                                    </th>
+                                    <th onclick="handleDetailSort('code')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition-colors text-center">
                                         제품코드 <span id="detail-sort-icon-code" class="text-[12px] ml-0.5 text-slate-500"><i class="fa-solid fa-sort"></i></span>
                                     </th>
-                                    <th onclick="handleDetailSort('color')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition-colors">
+                                    <th onclick="handleDetailSort('color')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition-colors text-center">
                                         컬러 <span id="detail-sort-icon-color" class="text-[12px] ml-0.5 text-slate-500"><i class="fa-solid fa-sort"></i></span>
                                     </th>
                                     <th onclick="handleDetailSort('qty')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition-colors text-center">
@@ -588,10 +591,10 @@
                                     <th onclick="handleDetailSort('status')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition-colors text-center">
                                         진행 <span id="detail-sort-icon-status" class="text-[12px] ml-0.5 text-slate-500"><i class="fa-solid fa-sort"></i></span>
                                     </th>
-                                    <th onclick="handleDetailSort('dueDate')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition-colors">
+                                    <th onclick="handleDetailSort('dueDate')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition-colors text-center">
                                         납기일 <span id="detail-sort-icon-dueDate" class="text-[12px] ml-0.5 text-slate-500"><i class="fa-solid fa-sort"></i></span>
                                     </th>
-                                    <th onclick="handleDetailSort('date')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition-colors text-accentBlue">
+                                    <th onclick="handleDetailSort('date')" class="py-3 px-4 cursor-pointer hover:bg-slate-800 transition-colors text-center">
                                         상차일 <span id="detail-sort-icon-date" class="text-[12px] ml-0.5 text-slate-500"><i class="fa-solid fa-sort"></i></span>
                                     </th>
                                 </tr>
