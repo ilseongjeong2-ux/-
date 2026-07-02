@@ -596,31 +596,66 @@
 
     </main>
 
-    <!-- 작업 인원 편집 모달 -->
-    <div id="card1WorkerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden" onclick="if(event.target===this)closeCard1WorkerModal()">
-        <div class="bg-panelBg border border-borderSlate rounded-2xl p-5 w-[400px] max-w-[95vw] shadow-2xl flex flex-col gap-4">
+    <!-- 작업 인원 등록 모달 -->
+    <div id="workerRegisterModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden" onclick="if(event.target===this)closeWorkerRegisterModal()">
+        <div class="bg-panelBg border border-borderSlate rounded-2xl p-5 w-[440px] max-w-[95vw] shadow-2xl flex flex-col gap-4">
+            <!-- 모달 헤더 -->
             <div class="flex items-center justify-between">
                 <h3 class="text-[17.5px] font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-users text-accentBlue"></i> 작업 인원 관리
+                    <i class="fa-solid fa-user-plus text-accentBlue"></i> 금일 작업 인원 등록
                 </h3>
-                <button onclick="closeCard1WorkerModal()" class="text-slate-400 hover:text-white transition-colors">
+                <button onclick="closeWorkerRegisterModal()" class="text-slate-400 hover:text-white transition-colors">
                     <i class="fa-solid fa-xmark text-[17.5px]"></i>
                 </button>
             </div>
-            <div id="card1DeptList" class="space-y-3 max-h-[340px] overflow-y-auto pr-1"></div>
+            <!-- 날짜 -->
+            <div class="flex flex-col gap-1">
+                <label class="text-[13.5px] text-slate-400 font-semibold">날짜</label>
+                <input id="wrm_date" type="date"
+                    class="bg-darkBg border border-borderSlate rounded-lg px-3 py-2 text-[14.5px] text-slate-200 focus:outline-none focus:border-accentBlue transition-colors w-full">
+            </div>
+            <!-- 부서 -->
+            <div class="flex flex-col gap-1">
+                <label class="text-[13.5px] text-slate-400 font-semibold">부서</label>
+                <input id="wrm_dept" type="text" placeholder="예: 생산1팀"
+                    class="bg-darkBg border border-borderSlate rounded-lg px-3 py-2 text-[14.5px] text-slate-200 focus:outline-none focus:border-accentBlue transition-colors w-full"
+                    onkeydown="if(event.key==='Enter')document.getElementById('wrm_workerInput').focus()">
+            </div>
+            <!-- 작업자 입력 -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[13.5px] text-slate-400 font-semibold">작업자</label>
+                <div class="flex gap-2">
+                    <input id="wrm_workerInput" type="text" placeholder="이름 입력 후 추가"
+                        class="flex-1 bg-darkBg border border-borderSlate rounded-lg px-3 py-2 text-[14.5px] text-slate-200 focus:outline-none focus:border-accentBlue transition-colors"
+                        onkeydown="if(event.key==='Enter')wrmAddWorker()">
+                    <button onclick="wrmAddWorker()"
+                        class="bg-slate-700 hover:bg-slate-600 text-white font-bold text-[14.5px] px-4 py-2 rounded-lg transition-colors whitespace-nowrap">
+                        추가
+                    </button>
+                </div>
+                <!-- 추가된 작업자 칩 -->
+                <div id="wrm_workerChips" class="flex flex-wrap gap-1.5 min-h-[28px]"></div>
+            </div>
+            <!-- 메모 -->
+            <div class="flex flex-col gap-1">
+                <label class="text-[13.5px] text-slate-400 font-semibold">메모 <span class="text-slate-600 font-normal">(선택)</span></label>
+                <textarea id="wrm_memo" placeholder="특이사항, 지시사항..."
+                    class="bg-darkBg border border-borderSlate rounded-lg px-3 py-2 text-[14.5px] text-slate-200 placeholder-slate-600 focus:outline-none focus:border-accentBlue transition-colors resize-none w-full"
+                    rows="2"></textarea>
+            </div>
+            <!-- 상태 메시지 -->
+            <div id="wrm_status" class="text-[13.5px] text-center hidden"></div>
+            <!-- 버튼 -->
             <div class="flex gap-2">
-                <input id="card1NewDeptInput" type="text" placeholder="새 부서명 입력"
-                    class="flex-1 bg-darkBg border border-borderSlate rounded-lg px-3 py-2 text-[14.5px] text-slate-200 focus:outline-none focus:border-accentBlue transition-colors"
-                    onkeydown="if(event.key==='Enter')addCard1Dept()">
-                <button onclick="addCard1Dept()"
-                    class="bg-accentBlue hover:bg-sky-400 text-darkBg font-bold text-[14.5px] px-4 py-2 rounded-lg transition-colors">
-                    + 부서
+                <button onclick="closeWorkerRegisterModal()"
+                    class="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold text-[14.5px] py-2.5 rounded-xl transition-colors">
+                    취소
+                </button>
+                <button id="wrm_submitBtn" onclick="submitWorkerRegister()"
+                    class="flex-2 bg-accentBlue hover:bg-sky-400 text-darkBg font-bold text-[14.5px] py-2.5 px-6 rounded-xl transition-colors flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> 등록 (구글 시트 전송)
                 </button>
             </div>
-            <button onclick="closeCard1WorkerModal()"
-                class="w-full bg-accentGreen hover:bg-emerald-400 text-darkBg font-bold text-[17.5px] py-2.5 rounded-xl transition-colors">
-                저장 완료
-            </button>
         </div>
     </div>
 
